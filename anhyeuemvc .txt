@@ -1,0 +1,227 @@
+
+local TweenService = game:GetService("TweenService")
+
+
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "Chii Hauu"
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+
+local OpenButton = Instance.new("TextButton", ScreenGui)
+OpenButton.Size = UDim2.new(0,60,0,60)
+OpenButton.Position = UDim2.new(0.05,0,0.4,0)
+OpenButton.Text = "≡"
+OpenButton.TextScaled = true
+OpenButton.Font = Enum.Font.GothamBold
+OpenButton.BackgroundColor3 = Color3.fromRGB(25,0,0)
+OpenButton.TextColor3 = Color3.fromRGB(255,60,60)
+OpenButton.Active = true
+OpenButton.Draggable = true
+
+Instance.new("UICorner", OpenButton).CornerRadius = UDim.new(1,0)
+
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0,0,0,0)
+MainFrame.Position = UDim2.new(0.5,0,0.5,0)
+MainFrame.AnchorPoint = Vector2.new(0.5,0.5)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15,0,0)
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0,20)
+
+local Stroke = Instance.new("UIStroke", MainFrame)
+Stroke.Color = Color3.fromRGB(255,0,0)
+Stroke.Thickness = 2
+
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1,0,0,40)
+Title.BackgroundTransparency = 1
+Title.Text = "Chii Hauu Hub"
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 18
+Title.TextColor3 = Color3.fromRGB(255,70,70)
+
+
+local Tabs = {"Farm","Quest","Stats"}
+local TabFrames = {}
+
+for i,tabName in pairs(Tabs) do
+	local Button = Instance.new("TextButton", MainFrame)
+	Button.Size = UDim2.new(0.28,0,0,35)
+	Button.Position = UDim2.new(0.05 + (i-1)*0.31,0,0.22,0)
+	Button.Text = tabName
+	Button.Font = Enum.Font.GothamBold
+	Button.TextSize = 14
+	Button.BackgroundColor3 = Color3.fromRGB(50,0,0)
+	Button.TextColor3 = Color3.new(1,1,1)
+	Instance.new("UICorner", Button).CornerRadius = UDim.new(0,10)
+
+	local Frame = Instance.new("Frame", MainFrame)
+	Frame.Size = UDim2.new(0.9,0,0.5,0)
+	Frame.Position = UDim2.new(0.05,0,0.4,0)
+	Frame.BackgroundColor3 = Color3.fromRGB(25,0,0)
+	Frame.Visible = false
+	Instance.new("UICorner", Frame).CornerRadius = UDim.new(0,15)
+
+	TabFrames[tabName] = Frame
+
+	Button.MouseButton1Click:Connect(function()
+		for _,f in pairs(TabFrames) do
+			f.Visible = false
+		end
+		Frame.Visible = true
+	end)
+end
+
+
+local AutoFarmEnabled = false
+local BringMobEnabled = false
+local Fly15Enabled = false
+local FastAttackEnabled = false
+
+local AutoFarmLoop
+
+
+BringMobToggle.MouseButton1Click:Connect(function()
+	BringMobEnabled = not BringMobEnabled
+	
+	if BringMobEnabled then
+		BringMobToggle.Text = "Gom Quái: ON"
+		BringMobToggle.BackgroundColor3 = Color3.fromRGB(120,0,0)
+	else
+		BringMobToggle.Text = "Gom Quái: OFF"
+		BringMobToggle.BackgroundColor3 = Color3.fromRGB(60,0,0)
+	end
+end)
+
+
+Fly15Toggle.MouseButton1Click:Connect(function()
+	Fly15Enabled = not Fly15Enabled
+	
+	if Fly15Enabled then
+		Fly15Toggle.Text = "Bay Cao 15: ON"
+		Fly15Toggle.BackgroundColor3 = Color3.fromRGB(120,0,0)
+	else
+		Fly15Toggle.Text = "Bay Cao 15: OFF"
+		Fly15Toggle.BackgroundColor3 = Color3.fromRGB(60,0,0)
+	end
+end)
+
+
+FastAttackToggle.MouseButton1Click:Connect(function()
+	FastAttackEnabled = not FastAttackEnabled
+	
+	if FastAttackEnabled then
+		FastAttackToggle.Text = "Fast Attack: ON"
+		FastAttackToggle.BackgroundColor3 = Color3.fromRGB(120,0,0)
+	else
+		FastAttackToggle.Text = "Fast Attack: OFF"
+		FastAttackToggle.BackgroundColor3 = Color3.fromRGB(60,0,0)
+	end
+end)
+
+
+AutoFarmToggle.MouseButton1Click:Connect(function()
+	AutoFarmEnabled = not AutoFarmEnabled
+	
+	if AutoFarmEnabled then
+		AutoFarmToggle.Text = "Auto Farm: ON"
+		AutoFarmToggle.BackgroundColor3 = Color3.fromRGB(120,0,0)
+
+		AutoFarmLoop = task.spawn(function()
+			while AutoFarmEnabled do
+				task.wait(0.15)
+
+				local player = game.Players.LocalPlayer
+				local char = player.Character
+				if not char then continue end
+				
+				local hrp = char:FindFirstChild("HumanoidRootPart")
+				if not hrp then continue end
+
+				
+				if BringMobEnabled and workspace:FindFirstChild("Enemies") then
+					for _,v in pairs(workspace.Enemies:GetChildren()) do
+						if v:FindFirstChild("HumanoidRootPart") then
+							v.HumanoidRootPart.CFrame = hrp.CFrame * CFrame.new(0,0,-5)
+						end
+					end
+				end
+
+				
+				if Fly15Enabled then
+					hrp.CFrame = hrp.CFrame + Vector3.new(0,15,0)
+				end
+
+				
+				if FastAttackEnabled then
+					local vu = game:GetService("VirtualUser")
+					vu:Button1Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+					vu:Button1Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+				end
+			end
+		end)
+
+	else
+		AutoFarmToggle.Text = "Auto Farm: OFF"
+		AutoFarmToggle.BackgroundColor3 = Color3.fromRGB(60,0,0)
+		AutoFarmEnabled = false
+	end
+end)
+
+Instance.new("UICorner", BringMobToggle).CornerRadius = UDim.new(0,12)
+
+local BringMobEnabled = false
+
+BringMobToggle.MouseButton1Click:Connect(function()
+	BringMobEnabled = not BringMobEnabled
+	
+	
+	
+	if BringMobEnabled then
+		BringMobToggle.Text = "Gom Quái: ON"
+		BringMobToggle.BackgroundColor3 = Color3.fromRGB(120,0,0)
+	else
+		BringMobToggle.Text = "Gom Quái: OFF"
+		BringMobToggle.BackgroundColor3 = Color3.fromRGB(60,0,0)
+	end
+end)
+
+
+local FarmLabel = Instance.new("TextLabel", TabFrames["Farm"])
+FarmLabel.Size = UDim2.new(1,0,1,0)
+FarmLabel.BackgroundTransparency = 1
+FarmLabel.Text = "Farm Settings UI Here"
+FarmLabel.TextColor3 = Color3.fromRGB(255,120,120)
+FarmLabel.TextScaled = true
+
+
+local function OpenMenu()
+	MainFrame.Visible = true
+	TweenService:Create(MainFrame,
+		TweenInfo.new(0.25,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),
+		{Size = UDim2.new(0,350,0,300)}
+	):Play()
+end
+
+local function CloseMenu()
+	local tween = TweenService:Create(MainFrame,
+		TweenInfo.new(0.2,Enum.EasingStyle.Quad,Enum.EasingDirection.In),
+		{Size = UDim2.new(0,0,0,0)}
+	)
+	tween:Play()
+	tween.Completed:Wait()
+	MainFrame.Visible = false
+end
+
+OpenButton.MouseButton1Click:Connect(function()
+	if MainFrame.Visible then
+		CloseMenu()
+	else
+		OpenMenu()
+	end
+end)
